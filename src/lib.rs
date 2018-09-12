@@ -1,11 +1,10 @@
 #![no_std]
-#![feature(lang_items)]
+#![feature(lang_items,panic_implementation)]
 
 mod base;
 mod gba;
 
 use base::rand::Rand;
-pub use base::rust_begin_unwind;
 
 #[derive(Copy, Clone)]
 enum Tile {
@@ -142,7 +141,9 @@ impl Game {
             Dir::Right => self.pos.x += 1,
         }
         match self.arena.get(self.pos.x, self.pos.y) {
-            Tile::Snake => self.reset(),
+            Tile::Snake => {
+                self.reset()
+            },
             Tile::Food => {
                 self.food_count -= 1;
                 self.target_length += 5;

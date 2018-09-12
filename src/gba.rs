@@ -64,11 +64,19 @@ pub mod hw {
             unsafe { write16(0x6000000u32 + offset * 2, data) }
         }
     }
+
+    // color for gba [unused bit] BBB BBGG GGGR RRRR
+    // downscales from 8bit color ( 255  -> 31 )
+    pub fn make_color(red: u8, green: u8, blue: u8) -> u16
+    {
+        (red / 8)  as u16 | ((green / 8)  as u16) << 5 | ((blue / 8) as u16) << 10
+    }
 }
 
 pub struct KeyState {
     state: u32,
 }
+
 pub enum Key {
     A = 1,
     B = 2,

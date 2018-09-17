@@ -3,65 +3,72 @@
 pub mod hw {
     use core::ptr::{read_volatile, write_volatile};
 
-    unsafe fn read16(addr: u32) -> u16 {
-        read_volatile(addr as *const u16)
-    }
-
-    unsafe fn write16(addr: u32, value: u16) {
-        write_volatile(addr as *mut u16, value);
-    }
-
     macro_rules! hw_reg {
-        (rw $addr: expr, $read:ident, $write: ident) => {
+        (rw $addr: expr, $read:ident, $write: ident, $data_type: ty) => {
             #[allow(dead_code)]
-            pub fn $read() -> u16 {
-                unsafe { read16($addr) }
+            pub fn $read() -> $data_type {
+                unsafe { read_volatile($addr as *const $data_type) }
             }
 
             #[allow(dead_code)]
-            pub fn $write(value: u16) {
-                unsafe { write16($addr, value) }
+            pub fn $write(value: $data_type) {
+                unsafe { write_volatile($addr as *mut $data_type, value); }
             }
         };
-        (r $addr: expr, $read: ident) => {
+        (r $addr: expr, $read: ident, $data_type: ty) => {
             #[allow(dead_code)]
-            pub fn $read() -> u16 {
-                unsafe { read16($addr) }
+            pub fn $read() ->  $data_type {
+                unsafe { read_volatile($addr as *const $data_type) }
             }
         };
-        (w $addr: expr, $write: ident) => {
+        (w $addr: expr, $write: ident, $data_type: ty) => {
             #[allow(dead_code)]
-            pub fn $write(value: u16) {
-                unsafe { write16($addr, value) }
+            pub fn $write(value:  $data_type) {
+                unsafe { write_volatile($addr as *mut $data_type, value); }
             }
         };
     }
 
-    hw_reg!(rw 0x4000000, read_dispcnt, write_dispcnt);
-    hw_reg!(rw 0x4000004, read_dispstat, write_dispstat);
-    hw_reg!(rw 0x4000008, read_bg0cnt, write_bg0cnt);
-    hw_reg!(rw 0x400000a, read_bg1cnt, write_bg1cnt);
-    hw_reg!(rw 0x400000c, read_bg2cnt, write_bg2cnt);
-    hw_reg!(rw 0x400000e, read_bg3cnt, write_bg3cnt);
-    hw_reg!(w 0x4000010, write_bg0hofs);
-    hw_reg!(w 0x4000012, write_bg0vofs);
-    hw_reg!(w 0x4000014, write_bg1hofs);
-    hw_reg!(w 0x4000016, write_bg1vofs);
-    hw_reg!(w 0x4000018, write_bg2hofs);
-    hw_reg!(w 0x400001a, write_bg2vofs);
-    hw_reg!(w 0x400001c, write_bg3hofs);
-    hw_reg!(w 0x400001e, write_bg3vofs);
-    hw_reg!(r 0x4000130, read_keyinput);
+    hw_reg!(rw 0x4000000, read_dispcnt, write_dispcnt, u16);
+    hw_reg!(rw 0x4000004, read_dispstat, write_dispstat, u16);
+    hw_reg!(rw 0x4000008, read_bg0cnt, write_bg0cnt, u16);
+    hw_reg!(rw 0x400000a, read_bg1cnt, write_bg1cnt, u16);
+    hw_reg!(rw 0x400000c, read_bg2cnt, write_bg2cnt, u16);
+    hw_reg!(rw 0x400000e, read_bg3cnt, write_bg3cnt, u16);
+    hw_reg!(w 0x4000010, write_bg0hofs, u16);
+    hw_reg!(w 0x4000012, write_bg0vofs, u16);
+    hw_reg!(w 0x4000014, write_bg1hofs, u16);
+    hw_reg!(w 0x4000016, write_bg1vofs, u16);
+    hw_reg!(w 0x4000018, write_bg2hofs, u16);
+    hw_reg!(w 0x400001a, write_bg2vofs, u16);
+    hw_reg!(w 0x400001c, write_bg3hofs, u16);
+    hw_reg!(w 0x400001e, write_bg3vofs, u16);
+    hw_reg!(r 0x4000130, read_keyinput, u16);
+
+    pub enum VideoMode {
+        Mode0 = 0b000,//tile mode, 4 bg layers, no rotate/scale, all support scroll
+        Mode1 = 0b001,//tile mode, 3 bg layers, only BG 2 can rotate/scale, BGs 0,1 support scroll
+        Mode2 = 0b010,//tile mode, 2 bg layers, BGs 2,3  can rotate/scale, no scroll
+        Mode3 = 0b0000010000000011,//bitmap mode 16bit color // BG 2 only, rotate/scale
+        Mode4 = 0b0000010000000100,//bitmap mode 8bit references to a palette // BG 2 only, rotate/scale
+        Mode5 = 0b0000010000000101,//bitmap mode 16 bit color backbufferd (160x128) // BG 2 only, rotate/scale
+    }
+
+    pub fn set_video_mode(mode : VideoMode) {
+        write_dispcnt(mode as u16);
+    }
 
     pub fn write_pal(index: u32, col: u16) {
         if index < 512 {
-            unsafe { write16(0x5000000u32 + (index * 2) as u32, col) }
+            unsafe {
+                write_volatile((0x5000000u32 + (index * 2) as u32) as *mut u16, col);
+            }
         }
     }
 
     pub fn write_vram16(offset: u32, data: u16) {
         if offset < 0xc000 {
-            unsafe { write16(0x6000000u32 + offset * 2, data) }
+            unsafe { write_volatile((0x6000000u32 + offset * 2) as *mut u16, data) }
         }
     }
 
@@ -69,7 +76,7 @@ pub mod hw {
     // downscales from 8bit color ( 255  -> 31 )
     pub fn make_color(red: u8, green: u8, blue: u8) -> u16
     {
-        (red / 8)  as u16 | ((green / 8)  as u16) << 5 | ((blue / 8) as u16) << 10
+        (red / 8) as u16 | ((green / 8) as u16) << 5 | ((blue / 8) as u16) << 10
     }
 }
 

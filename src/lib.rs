@@ -1,5 +1,5 @@
 #![no_std]
-#![feature(lang_items,panic_implementation)]
+#![feature(lang_items, panic_implementation)]
 
 mod base;
 mod gba;
@@ -22,7 +22,9 @@ struct Arena {
 
 impl Arena {
     pub fn new() -> Arena {
-        Arena { data: [Tile::Empty; WIDTH * HEIGHT] }
+        Arena {
+            data: [Tile::Empty; WIDTH * HEIGHT],
+        }
     }
 
     pub fn set(&mut self, x: usize, y: usize, tile: Tile) {
@@ -141,9 +143,7 @@ impl Game {
             Dir::Right => self.pos.x += 1,
         }
         match self.arena.get(self.pos.x, self.pos.y) {
-            Tile::Snake => {
-                self.reset()
-            },
+            Tile::Snake => self.reset(),
             Tile::Food => {
                 self.food_count -= 1;
                 self.target_length += 5;
@@ -160,19 +160,11 @@ impl Game {
 #[no_mangle]
 pub extern "C" fn main() {
     let mut key_state = gba::KeyState::new();
-    gba::hw::write_dispcnt(1 << 8);
-    gba::hw::write_bg0cnt(1 << 8);
-    gba::hw::write_pal(15, 0x7fff);
-    gba::hw::write_pal(31, 31 << 5);
-    for i in 1..7 {
-        gba::hw::write_vram16(i * 2, 0xfff0);
-        gba::hw::write_vram16(i * 2 + 1, 0x0fff);
-    }
-    let mut game = Game::new();
-    game.reset();
+    gba::hw::set_video_mode(gba::hw::VideoMode::Mode3);
+
+    let mut rand = Rand::new(1234);
     loop {
-        key_state.update();
-        game.update(&key_state);
+        gba::hw::write_vram16(( rand.next_u8_max(160) as u16 * 240 as u16  + rand.next_u8_max(240) as u16 ) as u32, gba::hw::make_color( rand.next_u8(), rand.next_u8(), rand.next_u8()));
         for _ in 0..4 {
             gba::wait_vblank();
         }

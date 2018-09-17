@@ -28,7 +28,7 @@ fn my_panic(pi: &PanicInfo) -> ! {
     load_font(0);
     gba::hw::write_pal(0, 0);
     gba::hw::write_pal(15, 0x7fff);
-    gba::hw::write_dispcnt(1 << 8);
+    gba::hw::write_dispcnt(0b0000000100000000);
     gba::hw::write_bg0cnt(2 << 8);
     for i in 0..(32 * 20) {
         gba::hw::write_vram16(0x800 + i, 0);
@@ -74,6 +74,9 @@ pub mod rand {
                 result |= (self.next_bool() as u8) << i;
             }
             result
+        }
+        pub fn next_u8_max(&mut self, max: u8) -> u8 {
+           self.next_u8() % (max + 1)
         }
     }
 }

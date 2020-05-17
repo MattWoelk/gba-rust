@@ -2,7 +2,7 @@
 
 set -e;
 
-# Needed for LTO by xargo / cargo
+# Needed for LTO by cargo-xbuild / cargo
 # (this is needed to use tools like clippy too)
 export CARGO_INCREMENTAL=0;
 
@@ -10,10 +10,10 @@ export CARGO_INCREMENTAL=0;
 if [ "$1" == "--release" ]
 then
   TARGET=release;
-  xargo build "$1" --target=gba;
+  cargo xbuild "$1" --target=gba;
 else
   TARGET=debug;
-  xargo build --target=gba;
+  cargo xbuild --target=gba;
 fi
 
 OUT_DIR=./out;

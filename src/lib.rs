@@ -1,5 +1,5 @@
 #![no_std]
-#![feature(lang_items,panic_implementation)]
+#![feature(lang_items)]
 
 mod base;
 mod gba;

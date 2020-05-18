@@ -22,7 +22,9 @@ struct Arena {
 
 impl Arena {
     pub fn new() -> Arena {
-        Arena { data: [Tile::Empty; WIDTH * HEIGHT] }
+        Arena {
+            data: [Tile::Empty; WIDTH * HEIGHT],
+        }
     }
 
     pub fn set(&mut self, x: usize, y: usize, tile: Tile) {
@@ -141,9 +143,7 @@ impl Game {
             Dir::Right => self.pos.x += 1,
         }
         match self.arena.get(self.pos.x, self.pos.y) {
-            Tile::Snake => {
-                self.reset()
-            },
+            Tile::Snake => self.reset(),
             Tile::Food => {
                 self.food_count -= 1;
                 self.target_length += 5;

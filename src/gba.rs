@@ -67,9 +67,8 @@ pub mod hw {
 
     // color for gba [unused bit] BBB BBGG GGGR RRRR
     // downscales from 8bit color ( 255  -> 31 )
-    pub fn make_color(red: u8, green: u8, blue: u8) -> u16
-    {
-        (red / 8)  as u16 | ((green / 8)  as u16) << 5 | ((blue / 8) as u16) << 10
+    pub fn make_color(red: u8, green: u8, blue: u8) -> u16 {
+        (red / 8) as u16 | ((green / 8) as u16) << 5 | ((blue / 8) as u16) << 10
     }
 }
 

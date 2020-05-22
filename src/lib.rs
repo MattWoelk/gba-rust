@@ -5,6 +5,7 @@ mod base;
 mod gba;
 
 use base::rand::Rand;
+use gba::hw::make_color;
 
 #[derive(Copy, Clone)]
 enum Tile {
@@ -162,7 +163,7 @@ pub extern "C" fn main() {
     let mut key_state = gba::KeyState::new();
     gba::hw::write_dispcnt(1 << 8);
     gba::hw::write_bg0cnt(1 << 8);
-    gba::hw::write_pal(15, 0x7fff);
+    gba::hw::write_pal(15, make_color(255, 0, 0));
     gba::hw::write_pal(31, 31 << 5);
     for i in 1..7 {
         gba::hw::write_vram16(i * 2, 0xfff0);

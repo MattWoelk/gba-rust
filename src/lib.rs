@@ -5,7 +5,7 @@ mod base;
 mod gba;
 
 use base::rand::Rand;
-use gba::hw::make_color;
+use gba::hw::{make_color, write_vram16};
 
 #[derive(Copy, Clone)]
 enum Tile {
@@ -16,6 +16,8 @@ enum Tile {
 const WIDTH: usize = 30;
 const HEIGHT: usize = 20;
 const MAX_LENGTH: usize = 100;
+
+const SCREEN_WIDTH: u32 = 240;
 
 struct Arena {
     data: [Tile; WIDTH * HEIGHT],
@@ -161,14 +163,32 @@ impl Game {
 #[no_mangle]
 pub extern "C" fn main() {
     let mut key_state = gba::KeyState::new();
+
+    gba::hw::write_dispcnt(3 | 1 << 10); // set mode 3, and enable bg2
+    //gba::hw::write_dispcnt(0x403); // set mode 3, and enable bg2
+
+    for x in 0..SCREEN_WIDTH {
+        for y in 0..100 {
+            write_vram16(x + (y * SCREEN_WIDTH), make_color(255, 0, 0));
+        }
+    }
+
+    loop {}
+
+    // ???
     gba::hw::write_dispcnt(1 << 8);
     gba::hw::write_bg0cnt(1 << 8);
+
+    // set up palette
     gba::hw::write_pal(15, make_color(255, 0, 0));
     gba::hw::write_pal(31, 31 << 5);
+
+    // ???
     for i in 1..7 {
         gba::hw::write_vram16(i * 2, 0xfff0);
         gba::hw::write_vram16(i * 2 + 1, 0x0fff);
     }
+
     let mut game = Game::new();
     game.reset();
     loop {

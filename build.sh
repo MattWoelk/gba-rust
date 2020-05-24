@@ -1,5 +1,7 @@
 #! /bin/bash
 
+export RUST_TARGET_PATH=`pwd`
+
 set -e;
 
 # Needed for LTO by cargo-xbuild / cargo

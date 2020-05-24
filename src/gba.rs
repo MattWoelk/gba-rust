@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+extern crate ux;
+
 pub mod hw {
     use core::ptr::{read_volatile, write_volatile};
 
@@ -73,6 +75,10 @@ pub mod hw {
 
     pub fn make_color_32(red: u8, green: u8, blue: u8) -> u16 {
         (red) as u16 | ((green) as u16) << 5 | ((blue) as u16) << 10
+    }
+
+    pub fn make_color_u5(red: ux::u5, green: ux::u5, blue: ux::u5) -> u16 {
+        u16::from(red) | u16::from(green) << 5 | u16::from(blue) << 10
     }
 }
 

@@ -1,4 +1,4 @@
-@echo off
+REM @echo off
 cd /d %~d0%~p0
 cd ..
 REM xargo build --release --target=gba

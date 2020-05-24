@@ -5,7 +5,7 @@ mod base;
 mod gba;
 
 use base::rand::Rand;
-use gba::hw::{make_color, write_vram16};
+use gba::hw::{make_color, make_color_32, write_vram16};
 
 #[derive(Copy, Clone)]
 enum Tile {
@@ -170,10 +170,10 @@ pub extern "C" fn main() {
 
 
     loop {
-        redness = (redness + 1) % 255;
+        redness = (redness + 1) % 32;
         for x in 0..SCREEN_WIDTH {
             for y in 0..100 {
-                write_vram16(x + (y * SCREEN_WIDTH), make_color(redness, 0, 0));
+                write_vram16(x + (y * SCREEN_WIDTH), make_color_32(redness, 0, 0));
             }
         }
     }

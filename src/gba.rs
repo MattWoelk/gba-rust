@@ -70,6 +70,10 @@ pub mod hw {
     pub fn make_color(red: u8, green: u8, blue: u8) -> u16 {
         (red / 8) as u16 | ((green / 8) as u16) << 5 | ((blue / 8) as u16) << 10
     }
+
+    pub fn make_color_32(red: u8, green: u8, blue: u8) -> u16 {
+        (red) as u16 | ((green) as u16) << 5 | ((blue) as u16) << 10
+    }
 }
 
 pub struct KeyState {

@@ -165,15 +165,18 @@ pub extern "C" fn main() {
     let mut key_state = gba::KeyState::new();
 
     gba::hw::write_dispcnt(3 | 1 << 10); // set mode 3, and enable bg2
-    //gba::hw::write_dispcnt(0x403); // set mode 3, and enable bg2
 
-    for x in 0..SCREEN_WIDTH {
-        for y in 0..100 {
-            write_vram16(x + (y * SCREEN_WIDTH), make_color(255, 0, 0));
+    let mut redness = 0;
+
+
+    loop {
+        redness = (redness + 1) % 255;
+        for x in 0..SCREEN_WIDTH {
+            for y in 0..100 {
+                write_vram16(x + (y * SCREEN_WIDTH), make_color(redness, 0, 0));
+            }
         }
     }
-
-    loop {}
 
     // ???
     gba::hw::write_dispcnt(1 << 8);

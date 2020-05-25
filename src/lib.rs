@@ -8,6 +8,7 @@ use base::rand::Rand;
 use gba::hw::{make_color, make_color_u5, write_vram16};
 
 extern crate ux;
+use ux::u5;
 
 #[derive(Copy, Clone)]
 enum Tile {
@@ -168,15 +169,15 @@ pub extern "C" fn main() {
 
     gba::hw::write_dispcnt(3 | 1 << 10); // set mode 3, and enable bg2
 
-    let mut redness: ux::u5 = ux::u5::new(0);
+    let mut redness: u5 = u5::new(0);
+    let radness: u5 = u5(8u8);
 
 
     loop {
-        //redness = (redness + ux::u5::new(1u8)) % ux::u5::new(32u8);
-        redness = redness.wrapping_add(ux::u5::new(1u8));
+        redness = redness.wrapping_add(u5::new(1u8));
         for x in 0..SCREEN_WIDTH {
             for y in 0..100 {
-                write_vram16(x + (y * SCREEN_WIDTH), make_color_u5(redness, ux::u5::new(0), ux::u5::new(0)));
+                write_vram16(x + (y * SCREEN_WIDTH), make_color_u5(redness, u5::new(0), u5::new(0)));
             }
         }
     }

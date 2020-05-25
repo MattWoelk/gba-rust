@@ -4,6 +4,7 @@ extern crate ux;
 
 pub mod hw {
     use core::ptr::{read_volatile, write_volatile};
+    use ux::u5;
 
     unsafe fn read16(addr: u32) -> u16 {
         read_volatile(addr as *const u16)
@@ -77,7 +78,7 @@ pub mod hw {
         (red) as u16 | ((green) as u16) << 5 | ((blue) as u16) << 10
     }
 
-    pub fn make_color_u5(red: ux::u5, green: ux::u5, blue: ux::u5) -> u16 {
+    pub fn make_color_u5(red: u5, green: u5, blue: u5) -> u16 {
         u16::from(red) | u16::from(green) << 5 | u16::from(blue) << 10
     }
 }

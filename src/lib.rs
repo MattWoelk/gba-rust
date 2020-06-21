@@ -5,7 +5,7 @@ mod base;
 mod gba;
 
 use base::rand::Rand;
-use gba::hw::{make_color, make_color_u5, write_vram16};
+use gba::hw::{make_color, make_color_u5, write_vram16, make_color_32};
 
 extern crate ux;
 use ux::u5;
@@ -167,34 +167,72 @@ impl Game {
 pub extern "C" fn main() {
     let mut key_state = gba::KeyState::new();
 
-    gba::hw::write_dispcnt(3 | 1 << 10); // set mode 3, and enable bg2
+//    gba::hw::write_dispcnt(3 | 1 << 10); // set mode 3, and enable bg2
+//
+//    let mut redness: u5 = u5::new(0);
+//    let radness: u5 = u5(8u8);
+//
+//
+//    loop {
+//        redness = redness.wrapping_add(u5::new(1u8));
+//        for x in 0..SCREEN_WIDTH {
+//            for y in 0..100 {
+//                write_vram16(x + (y * SCREEN_WIDTH), make_color_u5(redness, u5::new(0), u5::new(0)));
+//            }
+//        }
+//    }
 
-    let mut redness: u5 = u5::new(0);
-    let radness: u5 = u5(8u8);
-
-
-    loop {
-        redness = redness.wrapping_add(u5::new(1u8));
-        for x in 0..SCREEN_WIDTH {
-            for y in 0..100 {
-                write_vram16(x + (y * SCREEN_WIDTH), make_color_u5(redness, u5::new(0), u5::new(0)));
-            }
-        }
-    }
-
-    // ???
-    gba::hw::write_dispcnt(1 << 8);
-    gba::hw::write_bg0cnt(1 << 8);
+    // set display modes
+    gba::hw::write_dispcnt(1 << 8); // display bg0
+    gba::hw::write_bg0cnt(1 << 8); // configure bg0
+                                         // screen base block = 1 (2kB)
+                                         // "Sets the screenblock that serves as the base for screen-entry/map indexing. Values: 0-31."
+                                         // "The screenblock index set in REG_BGxCNT is the screen base block
+                                         // which indicates the start of the tilemap."
 
     // set up palette
-    gba::hw::write_pal(15, make_color(255, 0, 0));
-    gba::hw::write_pal(31, 31 << 5);
+    gba::hw::write_pal(15, make_color(255, 0, 0)); // snake
+    gba::hw::write_pal(31, make_color_32(0, 31, 0));/*31 << 5);*/ // (31 << 5) is full green. This is the pickup
 
     // ???
-    for i in 1..7 {
-        gba::hw::write_vram16(i * 2, 0xfff0);
-        gba::hw::write_vram16(i * 2 + 1, 0x0fff);
-    }
+    // if I comment out one of these two lines, the squares show up as vertical lines instead.
+    // 4bit depth (16 colors, 16 palettes)
+    //   Each tile occupies 32 bytes of memory, the first 4 bytes for the topmost row of the tile, and so on.
+    //   Each byte representing two dots, the lower 4 bits define the color for the left (!) dot,
+    //   the upper 4 bits the color for the right dot.
+    // if 1..15, and all F's, then it's solid squares (using 32bit and no multiplier)
+    //for i in 1..7 {
+    //gba::hw::write_vram32(0, 0xffffffff); // index 0 doesn't seem to do anything
+    // This is basically writing a mask of a sprite to the vram
+    // TODO: these may not all do something, so remove a bunch and see what happens. :)
+    gba::hw::write_vram32(1, 0xffffffff);
+    gba::hw::write_vram32(2, 0xffffffff);
+    gba::hw::write_vram32(3, 0xffffffff);
+    gba::hw::write_vram32(4, 0xffffffff);
+    gba::hw::write_vram32(5, 0xffffffff);
+    gba::hw::write_vram32(6, 0xfff00fff);
+    gba::hw::write_vram32(7, 0xfff00fff);
+    gba::hw::write_vram32(8, 0xfff00fff);
+    gba::hw::write_vram32(9, 0xfff00fff);
+    gba::hw::write_vram32(10, 0xfff00fff);
+    gba::hw::write_vram32(11, 0xffffffff);
+    gba::hw::write_vram32(12, 0xffffffff);
+    gba::hw::write_vram32(13, 0xffffffff);
+    gba::hw::write_vram32(14, 0xffffffff);
+    gba::hw::write_vram32(15, 0xffffffff);
+    //for i in 1..15 {
+    //    //gba::hw::write_vram16(i * 2, 0xfff0);
+    //    //gba::hw::write_vram16(i * 2 + 1, 0x0fff);
+
+    //    //gba::hw::write_vram32(i * 2, 0x0ffffff0);
+
+    //    //gba::hw::write_vram32(i, 0xfff00fff);
+
+    //    gba::hw::write_vram32(i, 0xfff00fff);
+
+    //    //gba::hw::write_vram16(i * 2, 0xffff);
+    //    //gba::hw::write_vram16(i * 2 + 1, 0xffff);
+    //}
 
     let mut game = Game::new();
     game.reset();

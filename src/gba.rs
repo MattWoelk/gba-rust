@@ -14,6 +14,10 @@ pub mod hw {
         write_volatile(addr as *mut u16, value);
     }
 
+    unsafe fn write32(addr: u32, value: u32) {
+        write_volatile(addr as *mut u32, value);
+    }
+
     macro_rules! hw_reg {
         (rw $addr: expr, $read:ident, $write: ident) => {
             #[allow(dead_code)]
@@ -56,15 +60,21 @@ pub mod hw {
     hw_reg!(w 0x400001e, write_bg3vofs);
     hw_reg!(r 0x4000130, read_keyinput);
 
-    pub fn write_pal(index: u32, col: u16) {
+    pub fn write_pal(index: u32, color: u16) {
         if index < 512 {
-            unsafe { write16(0x5000000u32 + (index * 2) as u32, col) }
+            unsafe { write16(0x5000000u32 + (index * 2) as u32, color) }
         }
     }
 
     pub fn write_vram16(offset: u32, data: u16) {
         if offset < 0xc000 {
             unsafe { write16(0x6000000u32 + offset * 2, data) }
+        }
+    }
+
+    pub fn write_vram32(offset: u32, data: u32) {
+        if offset < 0xc000 {
+            unsafe { write32(0x6000000u32 + offset * 2, data) }
         }
     }
 

@@ -210,11 +210,11 @@ pub extern "C" fn main() {
     gba::hw::write_vram32(3, 0xffffffff);
     gba::hw::write_vram32(4, 0xffffffff);
     gba::hw::write_vram32(5, 0xffffffff);
-    gba::hw::write_vram32(6, 0xfff00fff);
-    gba::hw::write_vram32(7, 0xfff00fff);
-    gba::hw::write_vram32(8, 0xfff00fff);
-    gba::hw::write_vram32(9, 0xfff00fff);
-    gba::hw::write_vram32(10, 0xfff00fff);
+    gba::hw::write_vram32(6, 0xffffffff); // does nothing ???
+    gba::hw::write_vram32(7, 0xfff00fff); // 00 is (top right | top left)
+    gba::hw::write_vram32(8, 0xffffffff); // does nothing ???
+    gba::hw::write_vram32(9, 0xfff00fff); // 00 is (bottom right | bottom left)
+    gba::hw::write_vram32(10, 0xffffffff); // does nothing ???
     gba::hw::write_vram32(11, 0xffffffff);
     gba::hw::write_vram32(12, 0xffffffff);
     gba::hw::write_vram32(13, 0xffffffff);
